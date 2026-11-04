@@ -1,0 +1,16 @@
+{
+  "name": "Quincaillerie Generale Toure Freres 17.21",
+  "short_name": "QGTF 17.21",
+  "start_url": "/qgtf-17.21/",
+  "display": "standalone",
+  "background_color": "#0a2a6b",
+  "theme_color": "#0a2a6b",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
