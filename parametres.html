@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paramètres Cachet - QGTF</title>
+<style>
+  body{font-family:Arial,sans-serif;padding:20px;max-width:500px;margin:auto;background:#f5f5f5}
+  .card{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+  h2{text-align:center;color:#B40000}
+  label{display:block;margin-top:18px;font-weight:bold;font-size:14px}
+  select,input{width:100%;padding:12px;margin-top:6px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box}
+  button{margin-top:22px;padding:14px;width:100%;background:#B40000;color:white;border:none;font-size:16px;font-weight:bold;border-radius:10px}
+  #preview{margin-top:20px;text-align:center;border:1px dashed #aaa;padding:10px;position:relative;height:220px;overflow:hidden;background:white;border-radius:10px}
+  #preview span{font-size:12px;color:#888}
+  #preview img{position:absolute;width:150px}
+  #msg{text-align:center;color:green;font-weight:bold;margin-top:10px}
+  .back{display:block;text-align:center;margin-top:15px;color:#333;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h2>⚙️ Paramètres du Cachet</h2>
+
+<label>Quel cachet ?</label>
+<select id="type">
+  <option value="paye-et-livre">PAYÉ ET LIVRÉ</option>
+  <option value="paye">PAYÉ</option>
+  <option value="aucun">Aucun cachet</option>
+</select>
+
+<label>Position sur la facture</label>
+<select id="position">
+  <option value="bottom-right">En bas à droite</option>
+  <option value="bottom-left">En bas à gauche</option>
+  <option value="bottom-center">En bas au milieu</option>
+  <option value="top-right">En haut à droite</option>
+  <option value="top-left">En haut à gauche</option>
+  <option value="center">Au milieu</option>
+</select>
+
+<label>Taille du cachet</label>
+<input type="range" id="size" min="100" max="300" value="180">
+
+<label>Inclinaison</label>
+<input type="range" id="rotate" min="-30" max="30" value="-12">
+
+<label>Opacité</label>
+<input type="range" id="opacity" min="50" max="100" value="90">
+
+<div id="preview">
+  <span>--- APERÇU FACTURE ---</span>
+  <img id="previewImg" src="cachet-paye-et-livre.png">
+</div>
+
+<button onclick="save()">✅ ENREGISTRER</button>
+<p id="msg"></p>
+<a class="back" href="index.html">← Retour à l'accueil</a>
+</div>
+
+<script>
+// --- 1. FONCTION APERÇU ---
+function updatePreview(){
+  const pos = document.getElementById('position').value;
+  const size = document.getElementById('size').value;
+  const rot = document.getElementById('rotate').value;
+  const op = document.getElementById('opacity').value;
+  const type = document.getElementById('type').value;
+  const img = document.getElementById('previewImg');
+
+  if(type==='aucun'){ img.style.display='none'; return; }
+  img.style.display='block';
+  img.src = type==='paye' ? 'cachet-paye.png' : 'cachet-paye-et-livre.png';
+  img.style.width = size+'px';
+  img.style.opacity = op/100;
+  img.style.top=''; img.style.left=''; img.style.right=''; img.style.bottom='';
+  img.style.transform = `rotate(${rot}deg)`;
+
+  if(pos==='top-left'){ img.style.top='30px'; img.style.left='10px'; }
+  if(pos==='top-right'){ img.style.top='30px'; img.style.right='10px'; }
+  if(pos==='center'){ img.style.top='50%'; img.style.left='50%'; img.style.transform+=` translate(-50%,-50%)`; }
+  if(pos==='bottom-left'){ img.style.bottom='10px'; img.style.left='10px'; }
+  if(pos==='bottom-right'){ img.style.bottom='10px'; img.style.right='10px'; }
+  if(pos==='bottom-center'){ img.style.bottom='10px'; img.style.left='50%'; img.style.transform+=` translateX(-50%)`; }
+}
+
+// Mettre à jour à chaque changement
+document.getElementById('type').addEventListener('change', updatePreview);
+document.getElementById('position').addEventListener('change', updatePreview);
+document.getElementById('size').addEventListener('input', updatePreview);
+document.getElementById('rotate').addEventListener('input', updatePreview);
+document.getElementById('opacity').addEventListener('input', updatePreview);
+
+// --- 2. SAUVEGARDE DANS LE TÉLÉPHONE + FIREBASE ---
+function save(){
+  const data = {
+    type: document.getElementById('type').value,
+    position: document.getElementById('position').value,
+    size: document.getElementById('size').value,
+    rotate: document.getElementById('rotate').value,
+    opacity: document.getElementById('opacity').value,
+  };
+  // Sauvegarde locale (marche tout de suite, même sans Firebase)
+  localStorage.setItem('qgtf_stamp_settings', JSON.stringify(data));
+  document.getElementById('msg').innerText = "✅ Enregistré ! Toutes tes factures vont utiliser ce réglage.";
+}
+
+// --- 3. CHARGER LES ANCIENS RÉGLAGES ---
+const saved = localStorage.getItem('qgtf_stamp_settings');
+if(saved){
+  const d = JSON.parse(saved);
+  document.getElementById('type').value = d.type;
+  document.getElementById('position').value = d.position;
+  document.getElementById('size').value = d.size;
+  document.getElementById('rotate').value = d.rotate;
+  document.getElementById('opacity').value = d.opacity;
+}
+updatePreview();
+</script>
+</body>
+</html>
